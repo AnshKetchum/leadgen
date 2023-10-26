@@ -103,11 +103,7 @@ class CustomPromptTemplate(StringPromptTemplate):
 
             my_list = list(intermediate_steps[-1])
 
-            print('match', match)
-
             p_INS_temp = prompt_Ins.format(thought=match.group(1).strip(), query=match.group(3).strip(), observation=my_list[1])
-
-            print('fed', p_INS_temp)
 
             my_list[1] = self.llm(p_INS_temp)
             my_tuple = tuple(my_list)            
