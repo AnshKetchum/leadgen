@@ -399,3 +399,4 @@ FodyWeavers.xsd
 
 #APIs for the LLMs.
 .env
+*.csv
