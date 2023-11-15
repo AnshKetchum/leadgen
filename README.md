@@ -1,5 +1,8 @@
 # 🌊 Riptide: Your open-source LLM-Energized Sword for Conquering Job Applications and Job Leads 🗡️
 
+
+[out.webm](https://github.com/AnshKetchum/riptide/assets/26364616/02ae0ff3-252f-4dc7-b2e7-f51e9575d717)
+
 ### Overview
 
 Ahoy there, matey! 🏴‍☠️ Welcome aboard the Riptide, a powerful tool that slices through the vast sea of client leads and job applications with the precision of a well-forged sword. This ocean-themed marvel harnesses the potent energy of LLM (Legendary Lead Magnet) to gather data about companies, enabling you to embark on personalized outreach or automatic job applications.
