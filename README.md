@@ -33,7 +33,7 @@ Riptide doesn't just stop at finding companies – it hoists its sails to gather
 
 ## 📝 Customized Outreach
 
-Once you've spotted your prey, Riptide helps you craft the perfect message. Use the personalized data to tailor your outreach, ensuring your missive lands with the force of a tidal wave, leaving a lasting impression.
+Once you've spotted your sea spot, Riptide helps you craft the perfect message. Use the personalized data to tailor your outreach, ensuring your missive lands with the force of a tidal wave, leaving a lasting impression.
 
 ## 📄 Automatic Job Applications
 
