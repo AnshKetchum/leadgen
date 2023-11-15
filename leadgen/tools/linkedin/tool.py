@@ -11,6 +11,7 @@ from langchain.embeddings import OpenAIEmbeddings
 
 class ObtainLinkedInData(BaseModel):
     keywords: str = Field()
+    num_jobs: Optional[int] = Field()
 
 class ObtainLinkedInDataTool(BaseTool):
     name = "obtain_linkedin_data"
@@ -20,44 +21,75 @@ class ObtainLinkedInDataTool(BaseTool):
 
     This would get you job postings from companies looking for data analysts. You can ALSO use this tool in sucession if you want data on multiple topics. For example, you might realize that
     after getting data on data analytics, some machine learning jobs might also be relevant. Then re-run this tool, and it'll add machine learning jobs as well
+
+    Additionally, you will have to specify the number of jobs you'll need. If no clear wording is given,
+    default to 5.
     """
 
     args_schema: Type[BaseModel] = ObtainLinkedInData 
 
 
     def _run(
-        self, keywords: str,run_manager = None
+        self, keywords: str, num_jobs: int = 5, run_manager = None
     ) -> str:
         """Use the tool."""
 
-        #data = get_linkedin_jobs(keywords, "US", 1)
-        #save_job_data(data)
+        print("Getting", num_jobs, "for", keywords)
+        data = get_linkedin_jobs(keywords, "US", 1, num_jobs)
+        save_job_data(data)
 
         return f'Sucessfully obtained LinkedIn company postings data on {keywords}! Now, use one of the other tools available to interact with the data'
 
     async def _arun(
-        self, keywords: str,run_manager = None
+        self, keywords: str, num_jobs: int = 5, run_manager = None
     ) -> str:
         """Use the tool asynchronously."""
 
-        #data = get_linkedin_jobs(keywords, "US", 1)
-        #save_job_data(data)
+        print("Getting", num_jobs, "for", keywords)
+        data = get_linkedin_jobs(keywords, "US", 1, num_jobs)
+        save_job_data(data)
 
         return f'Sucessfully obtained LinkedIn company postings data on {keywords}! Now, use one of the other tools available to interact with the data'
 
-def create_qa_retriever_tool(llm, fp = "jobs.csv"):
+class LinkedInJobRetrievalInput(BaseModel):
+    query: str = Field()
+
+class LinkedInJobRetrievalTool(BaseTool):
+    name = "job_retrieval_search"
+
+    description = """Ask about any jobs in the current jobs database.
     """
-    Creates a retriever tool to perform Q & A over the job postings data
-    """ 
-    NAME = "job_retrieval_search"
-    DESCRIPTION = "Ask about any jobs in the current jobs database."
 
-    loader = CSVLoader(file_path=fp)
-    documents = loader.load()
+    args_schema: Type[BaseModel] = LinkedInJobRetrievalInput 
 
-    print('Documents loaded. Ready for QA.')
-    embeddings = OpenAIEmbeddings()
-    vectorstore = FAISS.from_documents(documents, embeddings)
-    retriever_tool = create_retriever_tool(vectorstore.as_retriever(), NAME, DESCRIPTION)
-    return retriever_tool
+
+    def _run(
+        self, query: str, run_manager = None
+    ) -> str:
+        """Use the tool."""
+
+        loader = CSVLoader(file_path="jobs.csv")
+        documents = loader.load()
+
+        print('Documents loaded. Ready for QA.')
+        embeddings = OpenAIEmbeddings()
+        vectorstore = FAISS.from_documents(documents, embeddings)
+
+        return vectorstore.as_retriever().get_relevant_documents(query)
+
+    async def _arun(
+        self, query: str, run_manager = None
+    ) -> str:
+        """Use the tool asynchronously."""
+
+        loader = CSVLoader(file_path="jobs.csv")
+        documents = loader.load()
+
+        print('Documents loaded. Ready for QA.')
+        embeddings = OpenAIEmbeddings()
+        vectorstore = FAISS.from_documents(documents, embeddings)
+
+        return vectorstore.as_retriever().get_relevant_documents(query)
+
+
 

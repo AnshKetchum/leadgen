@@ -17,7 +17,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 
-def get_linkedin_jobs(job_title: str, location: str, pages: int = None) -> list:
+def get_linkedin_jobs(job_title: str, location: str, pages: int = None, limit: int = None) -> list:
     """
     Scrape job listings from LinkedIn based on job title and location.
 
@@ -94,6 +94,9 @@ def get_linkedin_jobs(job_title: str, location: str, pages: int = None) -> list:
         class_="base-card relative w-full hover:no-underline focus:no-underline base-card--link base-search-card base-search-card--link job-search-card",
     )
 
+    if limit:
+        job_listings = job_listings[:min(limit, len(job_listings))]
+
     try:
         for job in job_listings:
             # Extract job details
@@ -148,12 +151,12 @@ def get_linkedin_jobs(job_title: str, location: str, pages: int = None) -> list:
                 }
             )
             # Logging scrapped job with company and location information
-            logging.info(f'Scraped "{job_title}" at {job_company} in {job_location}...')
+            logging.info(f'Retrieved "{job_title}" at {job_company} in {job_location}...')
 
     # Catching any exception that occurs in the scrapping process
     except Exception as e:
         # Log an error message with the exception details
-        logging.error(f"An error occurred while scraping jobs: {str(e)}")
+        logging.error(f"An error occurred while getting jobs: {str(e)}")
 
         # Return the jobs list that has been collected so far
         # This ensures that even if the scraping process is interrupted due to an error, we still have some data
