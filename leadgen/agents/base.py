@@ -8,6 +8,8 @@ from langchain.callbacks import StreamlitCallbackHandler, FinalStreamingStdOutCa
 from ..tools.linkedin.tool import ObtainLinkedInDataTool, LinkedInJobRetrievalTool 
 from ..templates.base import TEMPLATE
 from ..tools.general.tool import local_vectorstore_retrieval
+from ..tools.general.misc import general_tools
+from ..tools.outreach.mail.gmail import tools as gmail_tools
 
 #Env
 import os
@@ -16,16 +18,20 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def get_chain(retriever = None, streamlit_container = None):
+def get_chain(retriever = None, streamlit_container = None, email = True):
 
     llm = ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", max_tokens=2048, openai_api_key=os.getenv("OPENAI_API_KEY"))
     tools = [ 
                 ObtainLinkedInDataTool(), 
                 LinkedInJobRetrievalTool(),
+                *general_tools
         ]
     
     if retriever:
         tools.append(local_vectorstore_retrieval(retriever))
+
+    if email:
+        tools.extend(gmail_tools)
     
     prompt = ChatPromptTemplate.from_messages([
         ("system", TEMPLATE),
