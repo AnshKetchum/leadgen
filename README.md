@@ -4,6 +4,14 @@
 
 Ahoy there, matey! 🏴‍☠️ Welcome aboard the Riptide, a powerful tool that slices through the vast sea of client leads and job applications with the precision of a well-forged sword. This ocean-themed marvel harnesses the potent energy of LLM (Legendary Lead Magnet) to gather data about companies, enabling you to embark on personalized outreach or automatic job applications.
 
+## Quickstart
+
+1. `pip install` all required packages
+2. 
+```
+streamlit run complex_dash.py
+```
+
 ## Features
 
 ## 🌐 Company Discovery
