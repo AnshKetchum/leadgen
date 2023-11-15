@@ -1,4 +1,4 @@
-# 🌊 Riptide: Your open-source LLM-Energized Sword for Conquering Job Applications and Job Leads 🗡️
+# 🌊 Riptide: Your open-source, llm-energized sword for job apps and leads 🗡️
 
 
 [out.webm](https://github.com/AnshKetchum/riptide/assets/26364616/02ae0ff3-252f-4dc7-b2e7-f51e9575d717)
