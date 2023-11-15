@@ -4,13 +4,19 @@
 
 Ahoy there, matey! 🏴‍☠️ Welcome aboard the Riptide, a powerful tool that slices through the vast sea of client leads and job applications with the precision of a well-forged sword. This ocean-themed marvel harnesses the potent energy of LLM (Legendary Lead Magnet) to gather data about companies, enabling you to embark on personalized outreach or automatic job applications.
 
-## Quickstart
+## Quickstart - JobsGPT
 
 1. `pip install` all required packages
-2. 
+2. Fill out `.env` with the various attributes below, add it to the base directory:
+
 ```
-streamlit run complex_dash.py
+OPENAI_API_KEY="YOUR KEY HERE"
 ```
+
+3. Grab a `client_secrets.json` file from the Google console (with Gmail scope), rename it to `credentials.json` , and add it to base
+  
+4. `streamlit run complex_dash.py`
+   
 
 ## Features
 
