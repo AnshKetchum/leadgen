@@ -16,6 +16,3 @@ general_tools = [
     DuckDuckGoSearchRun(),
     YahooFinanceNewsTool(), 
 ]
-
-if platform.python_version() >= "3.9.0":
-    general_tools.append(PythonAstREPLTool())

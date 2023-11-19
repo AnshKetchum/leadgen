@@ -35,8 +35,8 @@ class ObtainLinkedInDataTool(BaseTool):
         """Use the tool."""
 
         print("Getting", num_jobs, "for", keywords)
-        data = get_linkedin_jobs(keywords, "US", 1, num_jobs)
-        save_job_data(data)
+        #data = get_linkedin_jobs(keywords, "US", 1, num_jobs)
+        #save_job_data(data)
 
         return f'Sucessfully obtained LinkedIn company postings data on {keywords}! Now, use one of the other tools available to interact with the data'
 
@@ -46,8 +46,8 @@ class ObtainLinkedInDataTool(BaseTool):
         """Use the tool asynchronously."""
 
         print("Getting", num_jobs, "for", keywords)
-        data = get_linkedin_jobs(keywords, "US", 1, num_jobs)
-        save_job_data(data)
+        #data = get_linkedin_jobs(keywords, "US", 1, num_jobs)
+        #save_job_data(data)
 
         return f'Sucessfully obtained LinkedIn company postings data on {keywords}! Now, use one of the other tools available to interact with the data'
 

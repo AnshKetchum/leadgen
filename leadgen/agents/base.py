@@ -10,6 +10,8 @@ from ..templates.base import TEMPLATE
 from ..tools.general.tool import local_vectorstore_retrieval
 from ..tools.general.misc import general_tools
 from ..tools.outreach.mail.gmail import tools as gmail_tools
+from ..tools.resume.jsonres import CreateResumeTool
+from ..tools.cover_letter.gen import CreateCoverLetterTool
 
 #Env
 import os
@@ -22,9 +24,11 @@ def get_chain(retriever = None, streamlit_container = None, email = True):
 
     llm = ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", max_tokens=2048, openai_api_key=os.getenv("OPENAI_API_KEY"))
     tools = [ 
-                ObtainLinkedInDataTool(), 
-                LinkedInJobRetrievalTool(),
-                *general_tools
+            ObtainLinkedInDataTool(), 
+            LinkedInJobRetrievalTool(),
+            CreateResumeTool(),
+            CreateCoverLetterTool(), 
+            *general_tools
         ]
     
     if retriever:

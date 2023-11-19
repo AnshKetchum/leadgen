@@ -7,6 +7,11 @@ from langchain.chat_models import ChatOpenAI
 from langchain.document_loaders import UnstructuredFileLoader
 from leadgen.agents.base import get_chain 
 
+from leadgen.utils.doc_utils import extract_text_from_upload
+from leadgen.utils.latex_utils import generate_latex, template_commands, render_latex
+from leadgen.prompts.resume import generate_json_resume
+import json
+
 import os
 
 # Chat UI title
@@ -57,7 +62,6 @@ if uploaded_files:
             with open(os.path.join("data", "uploaded", file_path), "wb") as f:
                 f.write(uploaded_file.getvalue())
 
-            # Use UnstructuredFileLoader to load the PDF file
             loader = UnstructuredFileLoader(file_path)
             loaded_documents = loader.load()
             print(f"Number of files loaded: {len(loaded_documents)}")
