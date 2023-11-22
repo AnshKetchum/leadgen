@@ -14,6 +14,7 @@ from langchain.chat_models import ChatOpenAI
 from langchain.retrievers.multi_query import MultiQueryRetriever
 
 from leadgen.utils.latex_utils import generate_latex, template_commands, render_latex
+from leadgen.llms.current import provider
 
 from .prompts import BASICS_PROMPT, EDUCATION_PROMPT, AWARDS_PROMPT, PROJECTS_PROMPT, WORK_PROMPT, SKILLS_PROMPT, SYSTEM_TAILORING 
 import json 
@@ -52,9 +53,9 @@ class CreateResumeTool(BaseTool):
         """Use the tool."""
         print('Generating Resume.')
 
-        vectordb = FAISS.load_local('data', index_name="user_docs", embeddings= OpenAIEmbeddings())
+        vectordb = FAISS.load_local('data', index_name="user_docs", embeddings= provider.get_embeddings())
 
-        llm = ChatOpenAI(temperature=0)
+        llm = provider.get_llm()
         qa = ConversationalRetrievalChain.from_llm(llm=llm, retriever=vectordb.as_retriever())
                 
         #Generate a summary to be used as for CV
@@ -110,9 +111,9 @@ class CreateResumeTool(BaseTool):
 
         print('Generating Resume.')
 
-        vectordb = FAISS.load_local('data', index_name="user_docs", embeddings= OpenAIEmbeddings())
+        vectordb = FAISS.load_local('data', index_name="user_docs", embeddings= provider.get_embeddings())
 
-        llm = ChatOpenAI(temperature=0)
+        llm = provider.get_llm()
         qa = ConversationalRetrievalChain.from_llm(llm=llm, retriever=vectordb.as_retriever())
                 
         #Generate a summary to be used as for CV

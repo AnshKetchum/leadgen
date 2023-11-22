@@ -7,7 +7,8 @@ from typing import Optional, Type
 from langchain.agents.agent_toolkits.conversational_retrieval.tool import create_retriever_tool
 from langchain.document_loaders.csv_loader import CSVLoader
 from langchain.vectorstores.faiss import FAISS
-from langchain.embeddings import OpenAIEmbeddings
+
+from leadgen.llms.current import provider
 
 class ObtainLinkedInData(BaseModel):
     keywords: str = Field()
@@ -72,7 +73,7 @@ class LinkedInJobRetrievalTool(BaseTool):
         documents = loader.load()
 
         print('Documents loaded. Ready for QA.')
-        embeddings = OpenAIEmbeddings()
+        embeddings = provider.get_embeddings()
         vectorstore = FAISS.from_documents(documents, embeddings)
 
         return vectorstore.as_retriever().get_relevant_documents(query)
@@ -86,7 +87,7 @@ class LinkedInJobRetrievalTool(BaseTool):
         documents = loader.load()
 
         print('Documents loaded. Ready for QA.')
-        embeddings = OpenAIEmbeddings()
+        embeddings = provider.get_embeddings()
         vectorstore = FAISS.from_documents(documents, embeddings)
 
         return vectorstore.as_retriever().get_relevant_documents(query)

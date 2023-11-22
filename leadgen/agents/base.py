@@ -1,8 +1,12 @@
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain.chat_models import ChatOpenAI
 from langchain.agents import OpenAIFunctionsAgent, AgentExecutor
+from langchain.agents import ZeroShotAgent
+from langchain.agents.output_parsers import OpenAIFunctionsAgentOutputParser
+from langchain.agents.format_scratchpad import format_log_to_str, format_log_to_messages
 from langchain.memory import ConversationBufferWindowMemory
 from langchain.memory import StreamlitChatMessageHistory
+from langchain.schema.messages import FunctionMessage
+
 from langchain.callbacks import StreamlitCallbackHandler, FinalStreamingStdOutCallbackHandler
 
 from ..tools.linkedin.tool import ObtainLinkedInDataTool, LinkedInJobRetrievalTool 
@@ -13,16 +17,20 @@ from ..tools.outreach.mail.gmail import tools as gmail_tools
 from ..tools.resume.jsonres import CreateResumeTool
 from ..tools.cover_letter.gen import CreateCoverLetterTool
 
+import streamlit as st
+
 #Env
 import os
 from dotenv import load_dotenv
+from leadgen.llms.current import provider
+from langchain.chat_models import ChatOpenAI
 
 load_dotenv()
 
 
 def get_chain(retriever = None, streamlit_container = None, email = True):
 
-    llm = ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", max_tokens=2048, openai_api_key=os.getenv("OPENAI_API_KEY"))
+    llm = provider.get_llm()
     tools = [ 
             ObtainLinkedInDataTool(), 
             LinkedInJobRetrievalTool(),
@@ -44,15 +52,12 @@ def get_chain(retriever = None, streamlit_container = None, email = True):
         ("human", "{input}")
     ])
 
-
     msgs = StreamlitChatMessageHistory()
     memory = ConversationBufferWindowMemory(
                                         memory_key='chat_history',
                                         chat_memory= msgs,
                                         return_messages=True,
                                     )
-
-    llm=ChatOpenAI(temperature=0, model="gpt-4", streaming=True)
 
     callbacks = [
         FinalStreamingStdOutCallbackHandler()        
@@ -61,14 +66,26 @@ def get_chain(retriever = None, streamlit_container = None, email = True):
     if streamlit_container:
         callbacks.append(StreamlitCallbackHandler(streamlit_container))
 
+    # agent = (
+    #     {
+    #         "input": lambda x: x["input"],
+    #         "agent_scratchpad": lambda x: format_log_to_messages(x["intermediate_steps"]),
+    #         "chat_history": lambda x: x["chat_history"],
+    #     }
+    #     | prompt
+    #     | llm
+    #     | OpenAIFunctionsAgentOutputParser()
+    # )
+    
     agent = OpenAIFunctionsAgent(llm=llm, prompt=prompt, tools=tools)
     agent_executor = AgentExecutor(
         agent=agent, 
         tools=tools, 
         max_iterations=5, 
-        early_stopping_method="generate", 
         memory=memory,
-        callbacks=callbacks
+        callbacks=callbacks,
+        handle_parsing_errors=True,
+        early_stopping_method="generate",
     )
 
     return agent_executor

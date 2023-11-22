@@ -5,14 +5,18 @@ from langchain.text_splitter import CharacterTextSplitter
 from langchain.chains import ConversationalRetrievalChain
 from langchain.chat_models import ChatOpenAI
 from langchain.document_loaders import UnstructuredFileLoader
+
 from leadgen.agents.base import get_chain 
 
 from leadgen.utils.doc_utils import extract_text_from_upload
 from leadgen.utils.latex_utils import generate_latex, template_commands, render_latex
 from leadgen.prompts.resume import generate_json_resume
+from leadgen.llms.current import provider
+
 import json
 
 import os
+
 
 # Chat UI title
 st.header("JobsGPT")
@@ -21,8 +25,7 @@ st.subheader('File type supported: PDF/DOCX/TXT :city_sunrise:')
 openai_api_key = os.getenv("OPENAI_API_KEY")
 agent = None
 
-embeddings = OpenAIEmbeddings()
-
+embeddings = provider.get_embeddings()
 
 #if os.path.exists("data/user_docs.faiss"):
 #    vectorstore = FAISS.load_local(os.path.join("data", "user_docs."), embeddings)

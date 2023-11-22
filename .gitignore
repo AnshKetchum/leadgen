@@ -404,3 +404,6 @@ FodyWeavers.xsd
 data
 *.txt
 *.json
+
+#models directory
+models

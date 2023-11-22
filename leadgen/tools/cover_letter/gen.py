@@ -15,6 +15,8 @@ from langchain.retrievers.multi_query import MultiQueryRetriever
 
 from leadgen.utils.latex_utils import generate_latex, template_commands, render_latex
 from leadgen.prompts.resume import generate_json_resume
+from leadgen.llms.current import provider
+
 from config import OPENAI_API_KEY
 import random
 
@@ -126,7 +128,7 @@ class CreateCoverLetterTool(BaseTool):
 
         vectordb = FAISS.load_local('data', index_name="user_docs", embeddings=OpenAIEmbeddings())
 
-        llm = OpenAI(temperature=0)
+        llm = provider.get_llm()
         qa = ConversationalRetrievalChain.from_llm(llm=llm, retriever=vectordb.as_retriever(), return_source_documents=True)
                 
         #Generate a summary to be used for the cover letter
@@ -159,7 +161,7 @@ class CreateCoverLetterTool(BaseTool):
 
         vectordb = FAISS.load_local('data', index_name="user_docs", embeddings=OpenAIEmbeddings())
 
-        llm = OpenAI(temperature=0)
+        llm = provider.get_llm()
         qa = ConversationalRetrievalChain.from_llm(llm=llm, retriever=vectordb.as_retriever(), return_source_documents=True)
                 
         #Generate a summary to be used for the cover letter
