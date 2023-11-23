@@ -1,6 +1,6 @@
 from langchain.tools import Tool, BaseTool
 from pydantic import BaseModel, Field 
-from typing import Union, Tuple, Dict
+from typing import Any, Union, Tuple, Dict
 from typing import Optional, Type
 
 from langchain.agents.agent_toolkits.conversational_retrieval.tool import create_retriever_tool
@@ -8,6 +8,8 @@ from langchain.document_loaders.csv_loader import CSVLoader
 from langchain.vectorstores.faiss import FAISS
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.chains import ConversationalRetrievalChain
+from langchain.schema.messages import AIMessage
+
 
 from langchain.llms.openai import OpenAI
 from langchain.chat_models import ChatOpenAI
@@ -118,18 +120,17 @@ class CreateCoverLetterTool(BaseTool):
 
     args_schema: Type[BaseModel] = CreateCoverLetterInput
 
+    def __init_subclass__(cls, **kwargs: Any) -> None:
+        cls.userdb = kwargs['userdb']
 
     def _run(
         self, company_name: str, job_description: str, run_manager = None
     ) -> str:
         """Use the tool."""
 
-        print('running tool', company_name, job_description)
-
-        vectordb = FAISS.load_local('data', index_name="user_docs", embeddings=OpenAIEmbeddings())
-
-        llm = provider.get_llm()
-        qa = ConversationalRetrievalChain.from_llm(llm=llm, retriever=vectordb.as_retriever(), return_source_documents=True)
+        print('Cover letter', company_name, job_description)
+        llm = self.userdb.get_llm()
+        qa = self.userdb.get_qa_chain()
                 
         #Generate a summary to be used for the cover letter
         prompt = RETRIEVAL_TEMPLATE.replace("<job_description>", job_description)
@@ -141,10 +142,11 @@ class CreateCoverLetterTool(BaseTool):
 
         print('summary', cv_summary)  
 
-        prompt = COVER_LETTER_PROMPTS[random.randint(0, 100) % len(COVER_LETTER_PROMPTS)].format(job_description = job_description, cv_summary = "")
-
-        print(prompt, type(prompt))
+        prompt = COVER_LETTER_PROMPTS[random.randint(0, 100) % len(COVER_LETTER_PROMPTS)].format(job_description = job_description, cv_summary = cv_summary)
         cover_letter = llm.invoke(prompt)
+
+        if type(cover_letter) == AIMessage:
+            cover_letter = cover_letter.content
 
         print(cover_letter)
         with open('cover.txt', 'w') as f:
@@ -157,13 +159,10 @@ class CreateCoverLetterTool(BaseTool):
     ) -> str:
         """Use the tool."""
 
-        print('running tool', company_name, job_description)
+        print('Cover letter', company_name, job_description)
+        llm = self.userdb.get_llm()
+        qa = self.userdb.get_qa_chain()
 
-        vectordb = FAISS.load_local('data', index_name="user_docs", embeddings=OpenAIEmbeddings())
-
-        llm = provider.get_llm()
-        qa = ConversationalRetrievalChain.from_llm(llm=llm, retriever=vectordb.as_retriever(), return_source_documents=True)
-                
         #Generate a summary to be used for the cover letter
         prompt = RETRIEVAL_TEMPLATE.replace("<job_description>", job_description)
         cv_summary = qa(
@@ -174,12 +173,12 @@ class CreateCoverLetterTool(BaseTool):
 
         print('summary', cv_summary)  
 
-        prompt = COVER_LETTER_PROMPTS[random.randint(0, 100) % len(COVER_LETTER_PROMPTS)].format(job_description = job_description, cv_summary = "")
-
-        print(prompt, type(prompt))
+        prompt = COVER_LETTER_PROMPTS[random.randint(0, 100) % len(COVER_LETTER_PROMPTS)].format(job_description = job_description, cv_summary = cv_summary)
         cover_letter = llm.invoke(prompt)
 
-        print(cover_letter)
+        if type(cover_letter) == AIMessage:
+            cover_letter = cover_letter.content
+
         with open('cover.txt', 'w') as f:
             f.write(cover_letter)
 

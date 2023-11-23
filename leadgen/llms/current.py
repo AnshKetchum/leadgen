@@ -1,18 +1,29 @@
-from .openai import openAIProvider
-from .llama import llamaProvider
+from .openai import OpenAILLM
+from .llama import LLaMALLM
 import json 
 
-def get_llm_and_embeddings():
-    with open('prefs.json', 'r') as f:
-        dct = json.load(f)
 
-        if dct['llm'] == openAIProvider.SELECTOR:
-            return openAIProvider
-        
-        elif dct['llm'] == llamaProvider.SELECTOR:
-            return llamaProvider
+class Provider:
+    """
+        A wrapper selector class to pick our desired LLM 
+    """
 
-        raise NotImplementedError("The llm you want hasn't been added yet")
+    def __init__(self) -> None:
+
+        with open('prefs.json', 'r') as f:
+            dct = json.load(f)
+
+            if dct['llm'] == OpenAILLM.SELECTOR:
+                self.provider = OpenAILLM()
+            
+            elif dct['llm'] == LLaMALLM.SELECTOR:
+                self.provider = LLaMALLM()
+
+            else:
+                raise ValueError("The llm you want hasn't been added yet")
+
+    def get_llm_and_embeddings(self):
+        return self.provider
     
-provider = get_llm_and_embeddings()
+provider = Provider().get_llm_and_embeddings()
             

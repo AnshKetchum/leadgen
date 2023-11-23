@@ -19,5 +19,3 @@ class OpenAILLM(BaseLLM):
 
     def get_embeddings(self,    ):
         return self.embeddings
-
-openAIProvider = OpenAILLM()

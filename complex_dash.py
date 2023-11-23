@@ -13,6 +13,7 @@ from leadgen.utils.latex_utils import generate_latex, template_commands, render_
 from leadgen.prompts.resume import generate_json_resume
 from leadgen.llms.current import provider
 
+
 import json
 
 import os

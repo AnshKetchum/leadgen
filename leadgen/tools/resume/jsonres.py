@@ -46,7 +46,6 @@ class CreateResumeTool(BaseTool):
 
     args_schema: Type[BaseModel] = CreateResumeToolInput
 
-
     def _run(
         self, company_name: str, job_description: str, run_manager = None
     ) -> str:
@@ -93,15 +92,17 @@ class CreateResumeTool(BaseTool):
         print(json_resume)
 
         with open('json_resume.json', 'w') as f: 
-            json.dump(json_resume)
+            json.dump(json_resume, f)
 
         rand_choice = list(template_commands.keys())[random.randint(1, 100) % len(template_commands)]
         latex_resume = generate_latex(rand_choice, json_resume, ["education", "work", "skills", "projects", "awards"])
         resume_bytes = render_latex(template_commands[rand_choice], latex_resume)
 
+        print('writing bytes')
         with open('out.pdf', 'wb') as f:
             f.write(resume_bytes)
-
+        print('written bytes')
+        print('done')
         return f'Resume saved as out.pdf!'
 
     async def _arun(
@@ -151,7 +152,7 @@ class CreateResumeTool(BaseTool):
         print(json_resume)
 
         with open('json_resume.json', 'w') as f: 
-            json.dump(json_resume)
+            json.dump(json_resume, f)
 
         rand_choice = list(template_commands.keys())[random.randint(1, 100) % len(template_commands)]
         latex_resume = generate_latex(rand_choice, json_resume, ["education", "work", "skills", "projects", "awards"])

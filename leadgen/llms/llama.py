@@ -1,11 +1,11 @@
 from .base import BaseLLM
 
-N_BATCH = 32 
-N_GPU_LAYERS = 15 
-NUM_CONTEXT = 2048
-TEMPERATURE = 0.75
+N_BATCH = 2**7 
+N_GPU_LAYERS = 10 
+NUM_CONTEXT = 2**12
+TEMPERATURE = 0
 MODEL_PATH = "./models/llama-2-13b-chat.Q5_K_M.gguf"
-STOP_WORDS = ["\nHuman:"]
+STOP_WORDS = ["\nHuman:", "\nAI:", "\nAssistant:", "\nYou:"]
 
 
 class LLaMALLM(BaseLLM):
@@ -23,11 +23,11 @@ class LLaMALLM(BaseLLM):
                     n_batch=N_BATCH,
                     n_ctx=NUM_CONTEXT,
                     temperature=TEMPERATURE,
+                    stop=STOP_WORDS,
                     f16_kv=True,
                     verbose=True,
                     n_parts=-1,
                     streaming=True,
-                    stop=["\nHuman:"]
                 )
 
         self.embeddings = LlamaCppEmbeddings(
@@ -46,4 +46,3 @@ class LLaMALLM(BaseLLM):
     def get_embeddings(self):
         return self.embeddings
 
-llamaProvider = LLaMALLM()

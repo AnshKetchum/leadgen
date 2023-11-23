@@ -1,5 +1,5 @@
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain.agents import OpenAIFunctionsAgent, AgentExecutor
+from langchain.agents import AgentExecutor, OpenAIFunctionsAgent
 from langchain.agents import ZeroShotAgent
 from langchain.agents.output_parsers import OpenAIFunctionsAgentOutputParser
 from langchain.agents.format_scratchpad import format_log_to_str, format_log_to_messages
@@ -17,12 +17,17 @@ from ..tools.outreach.mail.gmail import tools as gmail_tools
 from ..tools.resume.jsonres import CreateResumeTool
 from ..tools.cover_letter.gen import CreateCoverLetterTool
 
+
 import streamlit as st
 
 #Env
 import os
 from dotenv import load_dotenv
+
 from leadgen.llms.current import provider
+from leadgen.db.JobsDatabase import JobsDatabase
+from leadgen.db.UsersDatabase import UsersDatabase
+
 from langchain.chat_models import ChatOpenAI
 
 load_dotenv()
@@ -30,13 +35,15 @@ load_dotenv()
 
 def get_chain(retriever = None, streamlit_container = None, email = True):
 
+    db = JobsDatabase(provider)
+    db_user = UsersDatabase(provider)
     llm = provider.get_llm()
+    
     tools = [ 
-            ObtainLinkedInDataTool(), 
-            LinkedInJobRetrievalTool(),
             CreateResumeTool(),
-            CreateCoverLetterTool(), 
-            *general_tools
+            CreateCoverLetterTool(userdb = db_user), 
+            *general_tools,
+            *db.get_toolkit(),
         ]
     
     if retriever:
@@ -45,11 +52,12 @@ def get_chain(retriever = None, streamlit_container = None, email = True):
     if email:
         tools.extend(gmail_tools)
     
+    print(TEMPLATE)
     prompt = ChatPromptTemplate.from_messages([
         ("system", TEMPLATE),
         MessagesPlaceholder(variable_name="agent_scratchpad"),
         MessagesPlaceholder(variable_name="chat_history"),
-        ("human", "{input}")
+        ("human", "{input}"),
     ])
 
     msgs = StreamlitChatMessageHistory()
@@ -66,17 +74,6 @@ def get_chain(retriever = None, streamlit_container = None, email = True):
     if streamlit_container:
         callbacks.append(StreamlitCallbackHandler(streamlit_container))
 
-    # agent = (
-    #     {
-    #         "input": lambda x: x["input"],
-    #         "agent_scratchpad": lambda x: format_log_to_messages(x["intermediate_steps"]),
-    #         "chat_history": lambda x: x["chat_history"],
-    #     }
-    #     | prompt
-    #     | llm
-    #     | OpenAIFunctionsAgentOutputParser()
-    # )
-    
     agent = OpenAIFunctionsAgent(llm=llm, prompt=prompt, tools=tools)
     agent_executor = AgentExecutor(
         agent=agent, 
